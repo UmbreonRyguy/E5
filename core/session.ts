@@ -19,6 +19,7 @@ export interface SessionState {
   /** Index into LEVELS. */
   readonly level: number;
   readonly puzzle: Puzzle;
+  /** Earlier puzzles of this level, oldest first. */
   readonly past: readonly Puzzle[];
 }
 

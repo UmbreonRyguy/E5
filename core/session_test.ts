@@ -44,3 +44,23 @@ Deno.test("every level's par route solves it", () => {
 Deno.test("the replay line", () => {
   assertEquals(replayAll(), "[replay] solved=5/5 moves=96 pushes=32");
 });
+
+Deno.test("undo with nothing to undo notifies no subscriber", () => {
+  const session = new Session();
+  let heard = 0;
+  session.subscribe(() => heard++);
+  session.dispatch({ kind: "undo" }); // nothing yet
+  session.dispatch({ kind: "move", direction: "right" });
+  session.dispatch({ kind: "undo" });
+  session.dispatch({ kind: "undo" }); // history is used up
+  assertEquals(heard, 2);
+});
+
+Deno.test("undo brings back the very puzzle from before the last move", () => {
+  const session = new Session();
+  session.dispatch({ kind: "move", direction: "right" });
+  const before = session.getState().puzzle;
+  session.dispatch({ kind: "move", direction: "right" });
+  session.dispatch({ kind: "undo" });
+  assertStrictEquals(session.getState().puzzle, before);
+});
